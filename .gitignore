@@ -1,0 +1,6 @@
+.idea
+todo.db
+*.pyc
+__pycache__
+migrations
+test.py

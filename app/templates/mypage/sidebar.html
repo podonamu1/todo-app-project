@@ -1,0 +1,29 @@
+<!-- 마이페이지 사이드 바 -->
+<div class="d-flex flex-nowrap">
+    <hr>
+        <!-- 사용자 정보 사이드 바 -->
+        <div class="d-flex flex-column flex-shrink-0 p-3 text-bg-dark border" style = "width: 200px">
+            <ul class="nav nav-pills flex-column mb-auto">
+                <li class="nav-item pb-3 border-bottom">
+                    <h3> 사용자 정보 </h3>
+                </li>
+                <li class="nav-item py-3 border-bottom" style="word-break:break-all">
+                    이름 : {{ g.user.name }}
+                </li>
+                <li class="nav-item py-3 border-bottom" style="word-break:break-all">
+                    <h6>사용자 소개 :</h6>
+                    {{ g.user.info }}
+                </li>
+                <li class="nav-item py-3">
+                    도구
+                </li>
+                <!-- 사용자 이름/소개 변경 버튼 -->
+                <li>
+                    <a href="{{ url_for('auth.modify_user') }}" class="nav-link active">
+                        이름, 소개 변경
+                    </a>
+                </li>
+            </ul>
+        </div>
+    <hr>
+</div>

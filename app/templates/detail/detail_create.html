@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block content %}
+<!-- 최상단 네비게이션 바 -->
+{% include 'navbar.html' %}
+<!-- 할 일 세부 사항 작성하는 창 -->
+<div class="container">
+    <!-- 페이지 제목 -->
+    <div class="py-3 border-bottom">
+        <h3>할 일 세부 사항 작성 하기</h3>
+    </div>
+    <!-- 할 일 세부 사항 작성 폼 -->
+    <!-- 위에서부터 차례대로 제목, 진행률, 작성완료 버튼, 나가기 버튼 -->
+    <form method="post">
+        {{ form.csrf_token }}
+        {% include "error.html" %}
+        <div class="my-3 py-3">
+            <label for="name">제목</label>
+            <input type="text" class="form-control" name="name" id="name"
+                   value="{{ form.name.data or '' }}">
+        </div>
+        <div class="my-3 py-3">
+            <label for="progress">진행률</label>
+            <input type="text" class="form-control" name="progress" id="progress"
+                   value="{{ form.progress.data or ''}}"/>
+        </div>
+        <button type="submit" class="btn btn-primary">작성 완료</button>
+        <a class="btn btn-secondary m-4" href="{{ url_for('todo.detail', todo_id=todo_id) }}">나가기</a>
+    </form>
+</div>
+{% endblock %}

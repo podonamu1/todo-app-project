@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block content %}
+<!-- 로그인 화면 -->
+<div class="container w-100 m-auto">
+    <h1 class="h1 my-3">TodoList App</h1>
+    <h1 class="h3 my-3">Sign in</h1>
+    <!-- 로그인 정보 입력 폼 -->
+    <form method="post">
+    {{ form.csrf_token }}
+    {% include "error.html" %}
+        <!-- 아이디 입력 칸 -->
+        <div class="form-floating py-3">
+            <label for="id">아이디</label>
+            <input type="text" class="form-control" name = "id" id="id"
+                    value="{{ form.id.data or '' }}">
+        </div>
+        <!-- 비밀 번호 입력 칸 -->
+        <div class="form-floating mb-3 py-3">
+            <label for="password">비밀 번호</label>
+            <input type="password" class="form-control" name = "password" id="password"
+                   value="{{ form.password.data or ''}}">
+        </div>
+        <!-- 로그인 버튼 -->
+        <button class="btn btn-primary w-25 py-3 mb-3" type="submit">로그인</button>
+    </form>
+    <!-- 회원 가입 버튼 -->
+    <a href="{{ url_for('auth.signup') }}"  class="btn btn-secondary w-25 py-3">회원 가입</a>
+</div>
+{% endblock %}

@@ -1,0 +1,38 @@
+<!-- 최상단 네비게이션 바 -->
+<!-- 로그인 및 회원가입 화면을 제외한 모든 화면에 존재 -->
+<!-- 위 화면은 점프 투 플라스크 3-01장 네비게이션 바 부분을 참고하여 만들었음 -->
+<nav class="navbar navbar-expand-md navbar-dark bg-dark">
+  <div class="container-fluid">
+    <!-- 프로그램 제목 -->
+    <!-- 마이페이지로 돌아가는 버튼 -->
+    <a class="navbar-brand" href="{{ url_for('main.mypage') }}">Todo App:D</a>
+    <!-- Navbar 닫혔을 때 여는 버튼 -->
+    <button class="navbar-toggler" type="button"
+            data-bs-toggle="collapse" data-bs-target="#navbarCollapse"
+            aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <!-- 네비게이션 바 요소들(크기가 줄어들면 닫힌다.) -->
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+      <ul class="navbar-nav me-auto mb-2 mb-md-0">
+        <!-- 마이페이지로 가는 버튼 -->
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="{{ url_for('main.mypage') }}">My TodoList</a>
+        </li>
+        <!-- 다른 사람의 할 일 페이지로 가는 버튼 -->
+        <li class="nav-item">
+          <a class="nav-link active" href="{{ url_for('others.search') }}">Others' TodoList</a>
+        </li>
+        <!-- 비활성화 버튼(추후 기능 추가 예정) -->
+        <li class="nav-item">
+          <a class="nav-link disabled" aria-disabled="true">Coming soon...</a>
+        </li>
+      </ul>
+      <!-- 로그아웃 버튼 -->
+      <div class="navbar-nav mw-auto mb-2 mb-md-0">
+        <a class="nav-link active" aria-current="page"
+           href="{{ url_for('auth.logout') }}">LogOut</a>
+      </div>
+    </div>
+  </div>
+</nav>

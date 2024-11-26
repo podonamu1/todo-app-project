@@ -1,0 +1,20 @@
+<!-- 점프 투 플라스크 2-10장 폼 모듈로 데이터 검증 더 쉽게 하기 부분을 참고하여 만들었음 -->
+<!-- 필드 오류 -->
+{% if form.errors %}
+<div class="alert alert-danger" role="alert">
+    {% for field, errors in form.errors.items() %}
+    <ul>
+        {% for error in errors %}
+        <li>{{ error }}</li>
+        {% endfor %}
+    </ul>
+    {% endfor %}
+</div>
+{% endif %}
+
+<!-- Flash 오류 -->
+{% for message in get_flashed_messages() %}
+<div class="alert alert-danger" role="alert">
+    {{ message }}
+</div>
+{% endfor %}

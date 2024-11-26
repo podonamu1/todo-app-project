@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block content %}
+<!-- Navigation Bar -->
+{% include 'navbar.html' %}
+<!-- 할 일 수정 화면 -->
+<div class="container">
+    <!-- 제목 -->
+    <div class="py-3 border-bottom">
+        <h3>할 일 수정하기</h3>
+    </div>
+    <!-- 할 일 수정하기 폼 -->
+    <!-- 위에서부터 차례대로 제목 입력창, 목표 날짜 및 시간 입력창,
+         상세 내용 입력창, 수정 완료 버튼, 나가기 버튼 -->
+    <form method="post">
+        {{ form.csrf_token }}
+        {% include "error.html" %}
+        <div class="my-3 py-3">
+            <label for="name">제목</label>
+            <input type="text" class="form-control" name="name" id="name"
+                   value="{{ form.name.data or '' }}">
+        </div>
+        <div class="my-3 py-3">
+            <label for="date">목표 날짜</label>
+            <input type="date" class="form-control" name="date" id="date"
+                   value="{{ form.date.data or '' }}"/>
+        </div>
+        <div>
+            <label for="time">목표 시간</label>
+            <input type="time" class="form-control" name="time" id="time"
+                   value="{{ form.time.data or '' }}"/>
+        </div>
+        <div class="my-3">
+            <label for="info">상세 내용</label>
+            <textarea class="form-control" name="info" id="info" rows="10">
+                {{ form.info.data or '' }}
+            </textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">할 일 수정 하기</button>
+        <a class="btn btn-secondary m-4"
+           href="{{ url_for('todo.detail', todo_id=todo.id) }}">나가기</a>
+    </form>
+</div>
+{% endblock %}

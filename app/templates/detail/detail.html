@@ -1,0 +1,230 @@
+{% extends 'base.html' %}
+{% block content %}
+<!-- 최상단 네비게이션 바 -->
+{% include 'navbar.html' %}
+<!-- 할 일 정보 상세 화면 -->
+<div class="d-flex flex-wrap bg-light p-3">
+    <div class="d-flex flex-column flex-grow-1 p-3 m-3">
+        <!-- 상단 네비게이션 바 -->
+        <nav class="navbar navbar-expand-md mb-4">
+            <div class="container-fluid">
+                <!-- 할 일 상세 정보 제목 -->
+                <div class="navbar-nav me-auto m-3 mb-md-0">
+                    <h3>할 일 상세 정보</h3>
+                </div>
+                <!-- 나가기 버튼,
+                     자신의 할 일 : 마이페이지로 이동
+                     다른 사람 할 일 : 다른 사람 할 일 검색 창으로 이동 -->
+                <div class="navbar-nav mw-auto m-3 mb-md-0">
+                    {% if todo.userId == g.user.id %}
+                        <a href="{{ url_for('main.mypage') }}" class="btn btn-secondary">나가기</a>
+                    {% else %}
+                        <a href="{{ url_for('others.search') }}" class="btn btn-secondary">나가기</a>
+                    {% endif %}
+                </div>
+            </div>
+        </nav>
+        <hr />
+        <!-- 오류 표시 -->
+        <!-- Flash 오류 -->
+        {% for message in get_flashed_messages() %}
+        <div class="alert alert-danger" role="alert">
+            {{ message }}
+        </div>
+        {% endfor %}
+        <!-- 상세 정보 제공 창 -->
+        <div class="container-fluid my-3" style="word-break:break-all">
+            <p>제목 : {{ todo.name }}</p>
+            <!-- 다른 사람의 할 일 경우 : 할 일 작성자 표시 -->
+            {% if todo.userId != g.user.id %}
+            <p>할 일 작성자 : {{ todo.user.name }}</p>
+            {% endif %}
+            <p>목표 시간 : {{ todo.time }}</p>
+            <p>설명 : {{ todo.info }}</p>
+            <p>진행률 : {{ todo.detail_set|progress }}%</p>
+            <p>좋아요 수 : {{ todo.like|length }}</p>
+            <!-- 자신의 할 일 + 즐겨찾기에 포함된 할 일 : 별표 표시 -->
+            {% if todo.userId == g.user.id %}
+            {% if todo.priority %}
+            <p>★즐겨 찾기에 추가됨★</p>
+            {% endif %}
+            {% endif %}
+        </div>
+        <!-- 중단 네비게이션 바 -->
+        <nav class="navbar navbar-expand-md mb-4">
+            <div class="container-fluid">
+                {% if g.user == todo.user %}
+                <!-- 수정 버튼 -->
+                <div class="navbar-nav m-3 p-3 mb-md-0">
+                    <a href="{{ url_for('todo.modify', todo_id=todo.id) }}"
+                       class="btn btn-secondary">수정</a>
+                </div>
+                <!-- 삭제 버튼-->
+                <div class="navbar-nav m-3 p-3 mb-md-0">
+                    <a href="javascript:void(0)" class="delete btn btn-secondary"
+                        data-uri="{{ url_for('todo.delete', todo_id=todo.id) }}">삭제</a>
+                </div>
+                <!-- 별표(중요도) 버튼 -->
+                <!-- 별표 미체크시 빈 별, 체크시 꽉 찬 별 표시 -->
+                <div class="navbar-nav m-3 p-3 mb-md-0">
+                    {% if (todo.priority == 1) %}
+                    <a href="javascript:void(0)" class="off btn btn-secondary"
+                       data-uri="{{ url_for('todo.priority', todo_id=todo.id) }}">★</a>
+                    {% else %}
+                    <a href="javascript:void(0)" class="on btn btn-secondary"
+                       data-uri="{{ url_for('todo.priority', todo_id=todo.id) }}">☆</a>
+                    {% endif %}
+                </div>
+                {% endif %}
+                <!-- 좋아요 (다른 사람만 누를 수 있다.) -->
+                <!-- 좋아요 누르기 전 : 비활성화 + 좋아요 버튼
+                     좋아요 누른 후 : 활성화 + 취소 버튼     -->
+                {% if g.user.id != todo.userId %}
+                <div class="navbar-nav m-3 p-3 mb-md-0">
+                    {% if g.user in todo.like %}
+                    <a href="javascript:void(0)" class="cancel btn btn-primary"
+                       data-uri="{{ url_for('todo.like', todo_id=todo.id) }}">♥ 취소</a>
+                    {% else %}
+                    <a href="javascript:void(0)" class="like btn btn-secondary"
+                       data-uri="{{ url_for('todo.like', todo_id=todo.id) }}">♡ 좋아요</a>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+        </nav>
+        <hr/>
+        <!-- 할 일 세부 사항 목록 -->
+        <h5 class="p-3">할 일 세부 사항 목록</h5>
+        <!-- 사용자의 할 일인 경우 세부 사항 추가 버튼 띄움-->
+        {% if g.user == todo.user %}
+            <a href="{{ url_for('todo.detail_create', todo_id=todo.id) }}" class="btn btn-primary m-3 row-3">세부 항목 추가</a>
+        {% endif %}
+        <!-- 세부 사항 목록을 나타내는 표 -->
+        <div class="my-3">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <td>세부 항목 이름</td>
+                        <td>진행율</td>
+                        {% if g.user == todo.user %}
+                        <td>수정</td>
+                        <td>삭제</td>
+                        {% endif %}
+                    </tr>
+                </thead>
+                <tbody>
+                {% if detail_list %}
+                {% for detail in detail_list %}
+                <tr>
+                    <td>{{ detail.name }}</td>
+                    <td>{{ detail.progress }}%</td>
+                    {% if g.user == todo.user %}
+                    <td><a href="{{ url_for('todo.detail_modify', todo_id=todo_id, detail_id=detail.id) }}">수정</a></td>
+                    <td><a href="javascript:void(0)" class="delete"
+                            data-uri="{{ url_for('todo.detail_delete', detail_id=detail.id) }}">삭제</a></td>
+                    {% endif %}
+                </tr>
+                {% endfor %}
+                {% endif %}
+                </tbody>
+            </table>
+        </div>
+        <hr>
+    </div>
+    <!-- 할 일 댓글 -->
+    <div class="d-flex flex-column p-3 m-3">
+        <h5 class="p-3">댓글 - ({{ comment_list|length }})</h5>
+        <!-- 댓글 작성 폼 -->
+        <form method="post">
+        {{ form.csrf_token }}
+        {% include "error.html" %}
+            <div class="pb-3">
+                <label for="text">댓글 입력</label>
+                <input type="text" class="form-control" name="text" id="text"
+                       value="{{ form.text.data or '' }}">
+            </div>
+            <button type="submit" class="btn btn-primary">작성 완료</button>
+        </form>
+        <!-- 댓글 목록 -->
+        <div class="my-3">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <td>No</td>
+                        <td>내용</td>
+                        <td>작성자</td>
+                        <td>작성 일시</td>
+                        <td>    </td>
+                    </tr>
+                </thead>
+                <tbody>
+                {% if comment_list %}
+                {% for comment in comment_list %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>{{ comment.text }}</td>
+                    <td>{{ comment.user.name }}</td>
+                    <td>{{ comment.writeTime }}</td>
+                    {% if g.user == comment.user %}
+                    <td><a href="javascript:void(0)" class="delete"
+                        data-uri="{{ url_for('todo.comment_delete', comment_id=comment.id) }}">삭제</a></td>
+                    {% endif %}
+                </tr>
+                {% endfor %}
+                {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+<!-- 자바스크립트 함수 모음 -->
+<!-- delete_elements : 항목 삭제 함수
+     priority_off_elements : 즐겨찾기에서 제거 함수
+     priority_on_elements : 즐겨찾기에 추가 함수
+     like_elements : 좋아요 누르는 함수
+     cancel_elements: 좋아요 취소 함수 -->
+{% block script %}
+<script type="text/javascript">
+    const delete_elements = document.getElementsByClassName("delete");
+    Array.from(delete_elements).forEach(function(element) {
+        element.addEventListener('click', function() {
+            if (confirm("정말로 삭제하시겠습니까?")) {
+                location.href = this.dataset.uri;
+            };
+        });
+    });
+    const priority_off_elements = document.getElementsByClassName("off");
+    Array.from(priority_off_elements).forEach(function(element) {
+        element.addEventListener('click', function() {
+            if (confirm("즐겨찾기에서 제거하겠습니까?")) {
+                location.href = this.dataset.uri;
+            };
+        });
+    });
+    const priority_on_elements = document.getElementsByClassName("on");
+    Array.from(priority_on_elements).forEach(function(element) {
+        element.addEventListener('click', function() {
+            if (confirm("즐겨찾기에 추가하겠습니까?")) {
+                location.href = this.dataset.uri;
+            };
+        });
+    });
+    const like_elements = document.getElementsByClassName("like");
+    Array.from(like_elements).forEach(function(element) {
+        element.addEventListener('click', function() {
+            if (confirm("좋아요를 누르겠습니까?")) {
+                location.href = this.dataset.uri;
+            };
+        });
+    });
+    const cancel_elements = document.getElementsByClassName("cancel");
+    Array.from(cancel_elements).forEach(function(element) {
+        element.addEventListener('click', function() {
+            if (confirm("좋아요를 취소하시겠습니까?")) {
+                location.href = this.dataset.uri;
+            };
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+{% block content %}
+<!-- Navigation Bar -->
+{% include 'navbar.html' %}
+<!-- 다른 사람의 할일 검색 창 -->
+<div class="container">
+    <div class="my-3 px-3">
+        <!-- 검색 창 -->
+        <div class="input-group">
+            <!-- 검색 기준 설정 -->
+            <select class="m-3" id="search_menu">
+                {% if menu == 'title' %}
+                <option value="title" selected>할 일 제목</option>
+                <option value="user">사용자</option>
+                {% else %}
+                <option value="title">할 일 제목</option>
+                <option value="user" selected>사용자</option>
+                {% endif %}
+            </select>
+            <!-- 키워드 입력창 -->
+            <input type="text" id="search_keyword" class="form-control m-3" value="{{ keyword or '' }}">
+            <!-- 검색 버튼 -->
+            <div class="input-group-append">
+                <button class="btn btn-primary m-3" type="button" id="btn_search">검색</button>
+            </div>
+        </div>
+    </div>
+    <!-- 다른 사람의 할 일을 출력하는 표 -->
+    <div>
+        <h4 class="mx-3">다른 사람의 할 일</h4>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>할 일 이름</th>
+                    <th>유저 이름</th>
+                    <th>목표 시간</th>
+                    <th>진행률</th>
+                </tr>
+            </thead>
+            {% if others_todo_list %}
+            {% for todo in others_todo_list.items %}
+                <tr>
+                    <td><a href="{{ url_for('todo.detail', todo_id=todo.id) }}">{{ todo.name }}</a></td>
+                    <td>{{ todo.user.name }}</td>
+                    <td>{{ todo.time }}</td>
+                    <td>{{ todo.detail_set|progress }}%</td>
+                </tr>
+            {% endfor %}
+            {% endif %}
+        </table>
+    </div>
+    <!-- 다른 사람의 할 일 페이지 변경 막대-->
+    <ul class="pagination justify-content-center">
+        <!-- 이전 페이지 -->
+        {% if others_todo_list.has_prev %}
+        <li class="page-item">
+            <a class="page-link doing" data-page="{{ others_todo_list.prev_num }}"
+               href="javascript:void(0)">이전</a>
+        </li>
+        {% else %}
+        <li class="page-item disabled">
+            <a class="page-link doing" tabindex="-1" aria-disabled="true"
+               href="javascript:void(0)">이전</a>
+        </li>
+        {% endif %}
+        <!-- 페이지 번호 -->
+        {% for page_num in others_todo_list.iter_pages() %}
+        {% if page_num %}
+        {% if page_num != others_todo_list.page %}
+        <li class="page-item">
+            <a class="page-link doing" data-page="{{ page_num }}"
+               href="javascript:void(0)">{{ page_num }}</a>
+        </li>
+        {% else %}
+        <li class="page-item active" aria-current="page">
+            <a class="page-link doing" data-page="{{ page_num }}"
+               href="javascript:void(0)">{{ page_num }}</a>
+        </li>
+        {% endif %}
+        {% else %}
+        <li class="page-item disabled">
+            <a class="page-link doing" href="javascript:void(0)">...</a>
+        </li>
+        {% endif %}
+        {% endfor %}
+        <!-- 다음 페이지 -->
+        {% if others_todo_list.has_next %}
+        <li class="page-item">
+            <a class="page-link doing" data-page="{{ others_todo_list.next_num }}"
+               href="javascript:void(0)">다음</a>
+        </li>
+        {% else %}
+        <li class="page-item disabled">
+            <a class="page-link doing" tabindex="-1" aria-disabled="true"
+               href="javascript:void(0)">다음</a>
+        </li>
+        {% endif %}
+    </ul>
+</div>
+<!-- 검색을 위한 숨겨진 폼 -->
+<form id="searchForm" method="get" action="{{ url_for('others.search') }}">
+    <input type="hidden" id="menu" name="menu" value="{{ menu or '' }}">
+    <input type="hidden" id="keyword" name="keyword" value="{{ keyword or '' }}">
+    <input type="hidden" id="page" name="page" value="{{ page or '' }}">
+</form>
+{% endblock %}
+<!-- 자바스크립트 함수 -->
+<!-- btn_search : 키워드와 검색 기준을 입력받아서 검색하는 함수 -->
+<!-- page_elements : 사용자가 페이지 바에서 선택한 페이지값을 불러오는 함수 -->
+{% block script %}
+<script type="text/javascript">
+    const btn_search = document.getElementById("btn_search");
+    btn_search.addEventListener('click', function() {
+        document.getElementById('menu').value = document.getElementById('search_menu').value;
+        document.getElementById('keyword').value = document.getElementById('search_keyword').value;
+        document.getElementById('page').value = 1;
+        document.getElementById('searchForm').submit();
+    });
+    const page_elements = document.getElementsByClassName("page-link");
+    Array.from(page_elements).forEach(function(element) {
+        element.addEventListener('click', function() {
+            document.getElementById('page').value = this.dataset.page;
+            document.getElementById('searchForm').submit();
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,24 @@
+<!-- 점프 투 플라스크 2-09장 표준 HTML과 탬플릿 상속 사용해보기 부분 참고하여 만들었음 -->
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <!-- required meta tags -->
+    <meta charset="UTF-8">
+    <meta name = "viewport" content = "width=device-width, initial-scale = 1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap.min.css') }}">
+
+    <!-- Title -->
+    <title>Python Todo App</title>
+</head>
+<body>
+<!-- 템플릿 안에 삽입될 내용 -->
+{% block content %}
+{% endblock %}
+<!-- Bootstrap JavaScript -->
+<script src="{{ url_for('static', filename='bootstrap.min.js') }}"></script>
+{% block script %}
+{% endblock %}
+</body>
+</html>

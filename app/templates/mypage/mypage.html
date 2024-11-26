@@ -1,0 +1,210 @@
+<!-- 페이지 변경 버튼
+     점프 투 플라스크 3-02장 게시판 페이징 부분을 참고하여 만들었음 -->
+<!-- 나의 할 일 검색 부분
+     점프 투 플라스크 3-14장 게시판 검색 부분을 참고하여 만들었음 -->
+{% extends 'base.html' %}
+{% block content %}
+<!-- Navigation Bar -->
+{% include 'navbar.html' %}
+<!-- 본문 부분 -->
+<div class="d-flex flex-nowrap bg-light p-3">
+    <!-- SideBar -->
+    {% include 'mypage/sidebar.html' %}
+    <!-- 나의 할 일 생성 버튼 및 할 일 목록 -->
+    <div class="d-flex flex-column flex-shrink-0 my-3 px-3">
+        <a class="btn btn-primary m-3" href="{{ url_for('todo.create') }}">할 일 생성하기</a>
+        <hr/>
+        <!-- 나의 할일 검색 창 -->
+        <div class="my-3 px-3">
+            <div class="input-group">
+                <input type="text" id="search_keyword" class="form-control" value="{{ keyword or '' }}">
+                <div class="input-group-append">
+                    <button class="btn btn-outline-secondary" type="button" id="btn_search">찾기</button>
+                </div>
+            </div>
+        </div>
+        <!-- 나의 할일 목록 -->
+        <h4 class="mx-3">앞으로 할 일</h4>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>☆</th>
+                    <th>할 일 이름</th>
+                    <th>목표 시간</th>
+                    <th>진행률</th>
+                </tr>
+            </thead>
+            {% if todo_list %}
+            {% for todo in todo_list.items %}
+                <tr>
+                    {% if todo.priority %}
+                    <td>★</td>
+                    {% else %}
+                    <td>  </td>
+                    {% endif %}
+                    <td><a href="{{ url_for('todo.detail', todo_id=todo.id) }}">{{ todo.name }}</a></td>
+                    <td>{{ todo.time }}</td>
+                    <td>{{ todo.detail_set|progress }}%</td>
+                </tr>
+            {% endfor %}
+            {% endif %}
+        </table>
+        <!-- 페이지 처리 시작 -->
+        <ul class="pagination justify-content-center">
+            <!-- 이전 페이지 -->
+            {% if todo_list.has_prev %}
+            <li class="page-item">
+                <a class="page-link doing" data-page="{{ todo_list.prev_num }}"
+                   href="javascript:void(0)">이전</a>
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+                <a class="page-link doing" tabindex="-1" aria-disabled="true"
+                   href="javascript:void(0)">이전</a>
+            </li>
+            {% endif %}
+            <!-- 페이지 번호 -->
+            {% for page_num in todo_list.iter_pages() %}
+            {% if page_num %}
+            {% if page_num != todo_list.page %}
+            <li class="page-item">
+                <a class="page-link doing" data-page="{{ page_num }}"
+                   href="javascript:void(0)">{{ page_num }}</a>
+            </li>
+            {% else %}
+            <li class="page-item active" aria-current="page">
+                <a class="page-link doing" data-page="{{ page_num }}"
+                   href="javascript:void(0)">{{ page_num }}</a>
+            </li>
+            {% endif %}
+            {% else %}
+            <li class="page-item disabled">
+                <a class="page-link doing" href="javascript:void(0)">...</a>
+            </li>
+            {% endif %}
+            {% endfor %}
+            <!-- 다음 페이지 -->
+            {% if todo_list.has_next %}
+            <li class="page-item">
+                <a class="page-link doing" data-page="{{ todo_list.next_num }}"
+                   href="javascript:void(0)">다음</a>
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+                <a class="page-link doing" tabindex="-1" aria-disabled="true"
+                   href="javascript:void(0)">다음</a>
+            </li>
+            {% endif %}
+        </ul>
+        <hr/>
+        <!-- 완료된 나의 할일 목록 -->
+        <h4 class="mx-3">완료된 할 일</h4>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>☆</th>
+                    <th>할 일 이름</th>
+                    <th>목표 시간</th>
+                    <th>진행률</th>
+                </tr>
+            </thead>
+            {% if todo_list %}
+            {% for todo in done_list.items %}
+                <tr>
+                    {% if todo.priority %}
+                    <td>★</td>
+                    {% else %}
+                    <td>  </td>
+                    {% endif %}
+                    <td><a href="{{ url_for('todo.detail', todo_id=todo.id) }}">{{ todo.name }}</a></td>
+                    <td>{{ todo.time }}</td>
+                    <td>{{ todo.detail_set|progress }}%</td>
+                </tr>
+            {% endfor %}
+            {% endif %}
+        </table>
+        <!-- 페이지 처리 시작 -->
+        <ul class="pagination justify-content-center">
+            <!-- 이전 페이지 -->
+            {% if done_list.has_prev %}
+            <li class="page-item">
+                <a class="page-link done" data-page="{{ done_list.prev_num }}"
+                   href="javascript:void(0)">이전</a>
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+                <a class="page-link done" tabindex="-1" aria-disabled="true"
+                   href="javascript:void(0)">이전</a>
+            </li>
+            {% endif %}
+            <!-- 페이지 번호 -->
+            {% for page_num in done_list.iter_pages() %}
+            {% if page_num %}
+            {% if page_num != done_list.page %}
+            <li class="page-item">
+                <a class="page-link done" data-page="{{ page_num }}"
+                   href="javascript:void(0)">{{ page_num }}</a>
+            </li>
+            {% else %}
+            <li class="page-item active" aria-current="page">
+                <a class="page-link done" data-page="{{ page_num }}"
+                   href="javascript:void(0)">{{ page_num }}</a>
+            </li>
+            {% endif %}
+            {% else %}
+            <li class="page-item disabled">
+                <a class="page-link done" href="javascript:void(0)">...</a>
+            </li>
+            {% endif %}
+            {% endfor %}
+            <!-- 다음 페이지 -->
+            {% if done_list.has_next %}
+            <li class="page-done-item">
+                <a class="page-link done" data-page="{{ done_list.next_num }}"
+                   href="javascript:void(0)">다음</a>
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+                <a class="page-link done" tabindex="-1" aria-disabled="true"
+                   href="javascript:void(0)">다음</a>
+            </li>
+            {% endif %}
+        </ul>
+    </div>
+</div>
+<!-- 검색을 위한 숨겨진 폼(GET 방식으로 호출) -->
+<form id="searchForm" method="get" action="{{ url_for('main.mypage') }}">
+    <input type="hidden" id="keyword" name="keyword" value="{{ keyword or '' }}">
+    <input type="hidden" id="page_doing" name="page_doing" value="{{ page_doing }}">
+    <input type="hidden" id="page_done" name="page_done" value="{{ page_done }}">
+</form>
+{% endblock %}
+<!-- 자바스크립트 함수
+     page_elements : 현재 진행중인 일 페이지의 번호를 사용자가 클릭한 값으로 변경
+     page_done_elements : 완료한 일 페이지의 번호를 사용자가 클릭한 값으로 변경
+     btn_search : 사용자가 검색창에 입력한 키워드로 검색 진행 -->ㄴ
+{% block script %}
+<script type="text/javascript">
+    const page_elements = document.getElementsByClassName("doing");
+    Array.from(page_elements).forEach(function(element) {
+        element.addEventListener('click', function() {
+            document.getElementById('page_doing').value = this.dataset.page;
+            document.getElementById('searchForm').submit();
+        });
+    });
+    const page_done_elements = document.getElementsByClassName("done");
+    Array.from(page_done_elements).forEach(function(element) {
+        element.addEventListener('click', function() {
+            document.getElementById('page_done').value = this.dataset.page;
+            document.getElementById('searchForm').submit();
+        });
+    });
+    const btn_search = document.getElementById("btn_search");
+    btn_search.addEventListener('click', function() {
+        document.getElementById('keyword').value = document.getElementById('search_keyword').value;
+        document.getElementById('page_doing').value = 1;
+        document.getElementById('page_done').value = 1;
+        document.getElementById('searchForm').submit();
+    });
+</script>
+{% endblock %}
